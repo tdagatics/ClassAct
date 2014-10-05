@@ -46,6 +46,11 @@ int main(int argc, const char * argv[])
 
     @autoreleasepool {
         
+        // Create an array of dictionaries, where each dictionary will end up holding the class name, hierarchy,
+        // an dmethod list for a given class
+        
+        NSMutableArray *runTimeClassesInfo = [NSMutableArray array];
+        
         // insert code here...
         // Declare a variable to hold the number of registered classes
         unsigned int classCount = 0;
@@ -64,11 +69,26 @@ int main(int argc, const char * argv[])
             NSString *className = NSStringFromClass(currentClass);
             
             //Log the class's name
-            NSLog(@"The class's name is %@", className);
-        }
+            //NSLog(@"The class's name is %@", className);
+            
+            NSArray *hierarchy = BNRHierarchyForClass(currentClass);
+            NSArray *methods = BNRMethodsForClass(currentClass);
+            NSDictionary *classInfoDict = @{@"className":className, @"hierarchy":hierarchy, @"method":methods};
+            
+            [runTimeClassesInfo addObject:classInfoDict];
+
         
         // We're done with the class list buffer, so free it
         free(classList);
+        
+        // Sort the classes info array alphabetically by name, and log it
+            NSSortDescriptor *alphaAsc = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
+            NSArray *sortedArray =[runTimeClassesInfo sortedArrayUsingDescriptors:@[alphaAsc]];
+
+        NSLog(@"There are %ld classes registered with this Program's runtime", sortedArray.count);
+            NSLog(@"%@", sortedArray);
+        }
+        
     }
     return 0;
 }
