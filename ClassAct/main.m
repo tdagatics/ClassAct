@@ -9,6 +9,38 @@
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
 
+NSArray *BNRHierarchyForClass(Class cls) {
+    // Declare an array to hold the list of this class and all of its superclasses, building a hierarchy
+    NSMutableArray *classHierarchy = [NSMutableArray array];
+    
+    // Keep climbing the class hierarchy until we get to a class with no superclass
+    for (Class c = cls; c != Nil; c = class_getSuperclass(c)) {
+        NSString *className = NSStringFromClass(c);
+        [classHierarchy insertObject:className atIndex:0];
+    }
+    return classHierarchy;
+}
+
+NSArray *BNRMethodsForClass(Class cls) {
+    
+    unsigned int methodCount = 0;
+    
+    Method *methodList = class_copyMethodList(cls, &methodCount);
+    
+    NSMutableArray *methodArray = [NSMutableArray array];
+                     
+    for (int m = 0; m < methodCount; m++) {
+        // Get the current method
+        Method currentMethod = methodList[m];
+        // Get the selector for the current method
+        SEL methodSelector = method_getName(currentMethod);
+        // Add its string representation to the array
+        [methodArray addObject:NSStringFromSelector(methodSelector)];
+    }
+    
+    return methodArray;
+}
+
 int main(int argc, const char * argv[])
 {
 
